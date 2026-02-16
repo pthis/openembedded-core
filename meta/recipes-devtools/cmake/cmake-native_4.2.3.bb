@@ -22,7 +22,7 @@ LIC_FILES_CHKSUM:append = " \
 B = "${WORKDIR}/build"
 do_configure[cleandirs] = "${B}"
 
-CMAKE_EXTRACONF = "\
+EXTRA_OECMAKE += "\
     -DCMAKE_LIBRARY_PATH=${STAGING_LIBDIR_NATIVE} \
     -DBUILD_CursesDialog=1 \
     -DCMAKE_USE_SYSTEM_LIBRARIES=1 \
@@ -41,7 +41,7 @@ do_configure () {
 	${S}/bootstrap --verbose --prefix=${prefix} \
 		${@oe.utils.parallel_make_argument(d, '--parallel=%d')} \
 		${@bb.utils.contains('CCACHE', 'ccache ', '--enable-ccache', '', d)} \
-		-- ${CMAKE_EXTRACONF}
+		-- ${EXTRA_OECMAKE}
 }
 
 do_compile() {
