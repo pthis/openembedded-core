@@ -5,8 +5,6 @@ DEPENDS += "bzip2-replacement-native xz-native zlib-native ncurses-native zstd-n
 
 SRC_URI += "file://OEToolchainConfig.cmake \
             file://environment.d-cmake.sh \
-            file://0001-Disable-use-of-ext2fs-ext2_fs.h-by-cmake-s-internal.patch \
-            file://0002-CMakeLists.txt-disable-USE_NGHTTP2.patch \
             "
 
 LICENSE:append = " & BSD-1-Clause & MIT & BSD-2-Clause & curl & Apache-2.0"
@@ -36,6 +34,9 @@ EXTRA_OECMAKE += "\
     -DENABLE_ACL=0 -DHAVE_ACL_LIBACL_H=0 \
     -DHAVE_SYS_ACL_H=0 \
 "
+
+# Ensure e2fsprogs isn't found on the host to remove a build dependency and reproducible builds.
+EXTRA_OECMAKE += "-DHAVE_EXT2FS_EXT2_FS_H=0 -DHAVE_WORKING_EXT2_IOC_GETFLAGS=0"
 
 do_configure () {
 	${S}/bootstrap --verbose --prefix=${prefix} \
