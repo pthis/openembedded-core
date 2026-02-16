@@ -187,6 +187,13 @@ do_install () {
 	fi
 }
 
+do_install:append:class-target () {
+        # Add support for config snippet includes
+        echo "" >> ${D}${sysconfdir}/ssl/openssl.cnf
+        echo ".include ${sysconfdir}/ssl/openssl.cnf.d" >> ${D}${sysconfdir}/ssl/openssl.cnf
+        install -d ${D}${sysconfdir}/ssl/openssl.cnf.d
+}
+
 do_install:append:class-native () {
 	create_wrapper ${D}${bindir}/openssl \
 	    OPENSSL_CONF=\${OPENSSL_CONF:-${libdir}/ssl-3/openssl.cnf} \
