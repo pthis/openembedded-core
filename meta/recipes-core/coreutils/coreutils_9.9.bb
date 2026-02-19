@@ -56,10 +56,10 @@ bindir_progs = "arch basename cksum comm csplit cut dir dircolors dirname du \
                 join link logname md5sum mkfifo nl nohup nproc od paste pathchk \
                 pinky pr printf ptx readlink realpath seq sha1sum sha224sum sha256sum \
                 sha384sum sha512sum shred shuf sort split sum tac tail tee test timeout \
-                tr truncate tsort tty unexpand uniq unlink uptime users vdir wc who whoami yes \
+                tr truncate tsort tty unexpand uniq unlink users vdir wc who whoami yes \
                 ${selinux_progs}"
 
-base_bindir_progs = "cat chgrp chmod chown cp date dd echo false hostname kill ln ls mkdir \
+base_bindir_progs = "cat chgrp chmod chown cp date dd echo false hostname ln ls mkdir \
                      mknod mv pwd rm rmdir sleep stty sync touch true uname stat"
 
 sbindir_progs = "chroot"
@@ -112,7 +112,7 @@ ALTERNATIVE_PRIORITY = "100"
 # Make hostname's priority higher than busybox but lower than net-tools
 ALTERNATIVE_PRIORITY[hostname] = "90"
 ALTERNATIVE:${PN} = "lbracket ${bindir_progs} ${base_bindir_progs} ${sbindir_progs} base32 base64 nice printenv mktemp df"
-ALTERNATIVE:${PN}-doc = "base32.1 base64.1 nice.1 mktemp.1 df.1 groups.1 kill.1 uptime.1 stat.1 hostname.1"
+ALTERNATIVE:${PN}-doc = "base32.1 base64.1 nice.1 mktemp.1 df.1 groups.1 stat.1 hostname.1"
 
 ALTERNATIVE_LINK_NAME[hostname.1] = "${mandir}/man1/hostname.1"
 
@@ -143,8 +143,6 @@ ALTERNATIVE_LINK_NAME[lbracket] = "${bindir}/["
 ALTERNATIVE_TARGET[lbracket] = "${bindir}/lbracket.${BPN}"
 
 ALTERNATIVE_LINK_NAME[groups.1] = "${mandir}/man1/groups.1"
-ALTERNATIVE_LINK_NAME[uptime.1] = "${mandir}/man1/uptime.1"
-ALTERNATIVE_LINK_NAME[kill.1] = "${mandir}/man1/kill.1"
 ALTERNATIVE_LINK_NAME[stat.1] = "${mandir}/man1/stat.1"
 
 # The statx() requires glibc >= 2.28 and linux kernel >= 4.11, it doesn't work
