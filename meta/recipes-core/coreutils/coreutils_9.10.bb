@@ -6,7 +6,7 @@ HOMEPAGE = "http://www.gnu.org/software/coreutils/"
 BUGTRACKER = "http://debbugs.gnu.org/coreutils"
 LICENSE = "GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464 \
-                    file://src/ls.c;beginline=1;endline=15;md5=824c1997414aea9f344747bd81cf5a31 \
+                    file://src/ls.c;beginline=1;endline=15;md5=f3bf23485dbd07e6c14bd74401b744c6\
                     "
 DEPENDS = "gmp libcap"
 DEPENDS:class-native = ""
@@ -15,11 +15,9 @@ inherit autotools gettext texinfo
 
 SRC_URI = "${GNU_MIRROR}/coreutils/${BP}.tar.xz \
            file://remove-usr-local-lib-from-m4.patch \
-           file://0001-fix-lseek-copy-loop.patch \
-           file://0002-fix-lseek-copy-loop.patch \
            file://run-ptest \
            "
-SRC_URI[sha256sum] = "19bcb6ca867183c57d77155eae946c5eced88183143b45ca51ad7d26c628ca75"
+SRC_URI[sha256sum] = "16535a9adf0b10037364e2d612aad3d9f4eca3a344949ced74d12faf4bd51d25"
 
 # http://git.savannah.gnu.org/cgit/coreutils.git/commit/?id=v8.27-101-gf5d7c0842
 #
@@ -179,6 +177,7 @@ do_install_ptest () {
     cp -r ${S}/tests/* ${D}${PTEST_PATH}/tests
     install -d ${D}${PTEST_PATH}/build-aux
     install ${S}/build-aux/test-driver ${D}${PTEST_PATH}/build-aux/
+    install -Dm 0644 ${S}/doc/coreutils.texi ${D}${PTEST_PATH}/doc/coreutils.texi
     install -Dm 0644 ${B}/lib/config.h ${D}${PTEST_PATH}/lib/config.h
     cp ${B}/Makefile ${D}${PTEST_PATH}/
     cp ${S}/init.cfg ${D}${PTEST_PATH}/
