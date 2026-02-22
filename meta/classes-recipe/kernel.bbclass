@@ -149,16 +149,13 @@ set -e
 """ % (type, type, type))
 
 
-    image = d.getVar('INITRAMFS_IMAGE')
-    # If the INTIRAMFS_IMAGE is set but the INITRAMFS_IMAGE_BUNDLE is set to 0,
-    # the do_bundle_initramfs does nothing, but the INITRAMFS_IMAGE is built
-    # standalone for use by wic and other tools.
-    if image:
+    if d.getVar('INITRAMFS_IMAGE') and bb.utils.to_boolean(d.getVar('INITRAMFS_IMAGE_BUNDLE')):
         if d.getVar('INITRAMFS_MULTICONFIG'):
             d.appendVarFlag('do_bundle_initramfs', 'mcdepends', ' mc:${BB_CURRENT_MC}:${INITRAMFS_MULTICONFIG}:${INITRAMFS_IMAGE}:do_image_complete')
         else:
             d.appendVarFlag('do_bundle_initramfs', 'depends', ' ${INITRAMFS_IMAGE}:do_image_complete')
-    if image and bb.utils.to_boolean(d.getVar('INITRAMFS_IMAGE_BUNDLE')):
+
+        bb.build.addtask('do_bundle_initramfs', 'do_deploy', 'do_install', d)
         bb.build.addtask('do_transform_bundled_initramfs', 'do_deploy', 'do_bundle_initramfs', d)
 
     # NOTE: setting INITRAMFS_TASK is for backward compatibility
@@ -305,39 +302,37 @@ copy_initramfs() {
 }
 
 do_bundle_initramfs () {
-	if [ ! -z "${INITRAMFS_IMAGE}" -a x"${INITRAMFS_IMAGE_BUNDLE}" = x1 ]; then
-		echo "Creating a kernel image with a bundled initramfs..."
-		copy_initramfs
-		# Backing up kernel image relies on its type(regular file or symbolic link)
-		tmp_path=""
-		for imageType in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do
-			if [ -h ${KERNEL_OUTPUT_DIR}/$imageType ] ; then
-				linkpath=`readlink -n ${KERNEL_OUTPUT_DIR}/$imageType`
-				realpath=`readlink -fn ${KERNEL_OUTPUT_DIR}/$imageType`
-				mv -f $realpath $realpath.bak
-				tmp_path=$tmp_path" "$imageType"#"$linkpath"#"$realpath
-			elif [ -f ${KERNEL_OUTPUT_DIR}/$imageType ]; then
-				mv -f ${KERNEL_OUTPUT_DIR}/$imageType ${KERNEL_OUTPUT_DIR}/$imageType.bak
-				tmp_path=$tmp_path" "$imageType"##"
-			fi
-		done
-		use_alternate_initrd=CONFIG_INITRAMFS_SOURCE=${B}/usr/${INITRAMFS_IMAGE_NAME}.cpio
-		kernel_do_compile
-		# Restoring kernel image
-		for tp in $tmp_path ; do
-			imageType=`echo $tp|cut -d "#" -f 1`
-			linkpath=`echo $tp|cut -d "#" -f 2`
-			realpath=`echo $tp|cut -d "#" -f 3`
-			if [ -n "$realpath" ]; then
-				mv -f $realpath $realpath.initramfs
-				mv -f $realpath.bak $realpath
-				ln -sf $linkpath.initramfs ${B}/${KERNEL_OUTPUT_DIR}/$imageType.initramfs
-			else
-				mv -f ${KERNEL_OUTPUT_DIR}/$imageType ${KERNEL_OUTPUT_DIR}/$imageType.initramfs
-				mv -f ${KERNEL_OUTPUT_DIR}/$imageType.bak ${KERNEL_OUTPUT_DIR}/$imageType
-			fi
-		done
-	fi
+	echo "Creating a kernel image with a bundled initramfs..."
+	copy_initramfs
+	# Backing up kernel image relies on its type(regular file or symbolic link)
+	tmp_path=""
+	for imageType in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do
+		if [ -h ${KERNEL_OUTPUT_DIR}/$imageType ] ; then
+			linkpath=`readlink -n ${KERNEL_OUTPUT_DIR}/$imageType`
+			realpath=`readlink -fn ${KERNEL_OUTPUT_DIR}/$imageType`
+			mv -f $realpath $realpath.bak
+			tmp_path=$tmp_path" "$imageType"#"$linkpath"#"$realpath
+		elif [ -f ${KERNEL_OUTPUT_DIR}/$imageType ]; then
+			mv -f ${KERNEL_OUTPUT_DIR}/$imageType ${KERNEL_OUTPUT_DIR}/$imageType.bak
+			tmp_path=$tmp_path" "$imageType"##"
+		fi
+	done
+	use_alternate_initrd=CONFIG_INITRAMFS_SOURCE=${B}/usr/${INITRAMFS_IMAGE_NAME}.cpio
+	kernel_do_compile
+	# Restoring kernel image
+	for tp in $tmp_path ; do
+		imageType=`echo $tp|cut -d "#" -f 1`
+		linkpath=`echo $tp|cut -d "#" -f 2`
+		realpath=`echo $tp|cut -d "#" -f 3`
+		if [ -n "$realpath" ]; then
+			mv -f $realpath $realpath.initramfs
+			mv -f $realpath.bak $realpath
+			ln -sf $linkpath.initramfs ${B}/${KERNEL_OUTPUT_DIR}/$imageType.initramfs
+		else
+			mv -f ${KERNEL_OUTPUT_DIR}/$imageType ${KERNEL_OUTPUT_DIR}/$imageType.initramfs
+			mv -f ${KERNEL_OUTPUT_DIR}/$imageType.bak ${KERNEL_OUTPUT_DIR}/$imageType
+		fi
+	done
 }
 do_bundle_initramfs[dirs] = "${B}"
 
@@ -356,8 +351,6 @@ python do_package:prepend () {
 python do_devshell:prepend () {
     os.environ["LDFLAGS"] = ''
 }
-
-addtask bundle_initramfs after do_install before do_deploy
 
 KERNEL_DEBUG_TIMESTAMPS ??= "0"
 
@@ -860,7 +853,7 @@ kernel_do_deploy() {
 # ensure we get the right values for both
 do_deploy[prefuncs] += "read_subpackage_metadata"
 
-addtask deploy after do_populate_sysroot do_packagedata
+addtask deploy after do_install do_populate_sysroot do_packagedata
 
 EXPORT_FUNCTIONS do_deploy
 
