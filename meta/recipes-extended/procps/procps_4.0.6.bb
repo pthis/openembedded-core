@@ -14,9 +14,8 @@ inherit autotools gettext pkgconfig update-alternatives
 
 SRC_URI = "git://gitlab.com/procps-ng/procps.git;protocol=https;branch=master;tag=v${PV} \
            file://sysctl.conf \
-           file://top_large_pid_fix.patch \
            "
-SRCREV = "f46b2f7929cdfe2913ed0a7f585b09d6adbf994e"
+SRCREV = "4dafddf4c3f4646caa517f039a2307e92657ec93"
 
 # Upstream has a custom autogen.sh which invokes po/update-potfiles as they
 # don't ship a po/POTFILES.in (which is silly).  Without that file gettext
