@@ -1,4 +1,4 @@
-From 2e140fea6c275f3258893d2da2480027b16efb92 Mon Sep 17 00:00:00 2001
+From 278d02b08f513b288f31648bc5ec5c47ecb61686 Mon Sep 17 00:00:00 2001
 From: Christian Hofstaedtler <zeha@debian.org>
 Date: Tue, 10 Oct 2017 15:04:34 -0300
 Subject: [PATCH] rdoc: build reproducible documentation
@@ -9,29 +9,33 @@ Upstream-Status: Backport [debian]
 
 Signed-off-by: Antonio Terceiro <terceiro@debian.org>
 Signed-off-by: Christian Hofstaedtler <zeha@debian.org>
----
- lib/rdoc/generator/json_index.rb | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/lib/rdoc/generator/json_index.rb b/lib/rdoc/generator/json_index.rb
-index 065caa4..cfa1f33 100644
---- a/lib/rdoc/generator/json_index.rb
-+++ b/lib/rdoc/generator/json_index.rb
-@@ -176,7 +176,7 @@ class RDoc::Generator::JsonIndex
-     debug_msg "Writing gzipped search index to %s" % outfile
+rebase to version 4.0.1
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ .bundle/gems/rdoc-7.0.3/lib/rdoc/generator/json_index.rb | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/.bundle/gems/rdoc-7.0.3/lib/rdoc/generator/json_index.rb b/.bundle/gems/rdoc-7.0.3/lib/rdoc/generator/json_index.rb
+index 065caa4..a76c202 100644
+--- a/.bundle/gems/rdoc-7.0.3/lib/rdoc/generator/json_index.rb
++++ b/.bundle/gems/rdoc-7.0.3/lib/rdoc/generator/json_index.rb
+@@ -177,6 +177,7 @@ class RDoc::Generator::JsonIndex
  
      Zlib::GzipWriter.open(outfile) do |gz|
--      gz.mtime = File.mtime(search_index_file)
+       gz.mtime = File.mtime(search_index_file)
 +      gz.mtime = -1
        gz.orig_name = search_index_file.basename.to_s
        gz.write search_index
        gz.close
-@@ -194,7 +194,7 @@ class RDoc::Generator::JsonIndex
-         debug_msg "Writing gzipped file to %s" % outfile
+@@ -195,6 +196,7 @@ class RDoc::Generator::JsonIndex
  
          Zlib::GzipWriter.open(outfile) do |gz|
--          gz.mtime = File.mtime(dest)
+           gz.mtime = File.mtime(dest)
 +          gz.mtime = -1
            gz.orig_name = dest.basename.to_s
            gz.write data
            gz.close
+-- 
+2.34.1
+
